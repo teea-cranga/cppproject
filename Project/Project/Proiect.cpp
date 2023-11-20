@@ -57,64 +57,63 @@ public:
 };
 
 
-//these distract me, i will comment them out in order to focus on the first class
 
-//class Location {
-//
-//	int noCategories = 3;
-//	int* seats;	//an array which will either have 0(available) or 1 (taken)
-//	int noSeats;
-//	category cat;
-//	int catPrices[3]; //list of prices for each event
-//	static int CAPACITY;
-//public:
-//
-//};
-//
-//class Ticket {
-//	unsigned long id;
-//	int price;
-//	category tickCat=TIP1;
-//	bool isValid;
-//	char* nameOfBuyer=nullptr;
-//	const int MIN_LENGTH = 4;
-//	static int NO_TICKETS;
-//public:
-//	char* getName(const char* nameOfBuyer) {
-//		if (strlen(this->nameOfBuyer) < MIN_LENGTH)
-//			throw exception("Invalid buyer name.");
-//		char* copy = Util::copyString(this->nameOfBuyer);
-//		return copy;
-//	}
-//
-//	void setName() {
-//		this->nameOfBuyer = Util::copyString(this->nameOfBuyer);
-//	}
-//
-//	Ticket() : price(300),isValid(true) {
-//		NO_TICKETS++;
-//	}
-//};
-//
-//int main() {
-// 
-//	cout << "\t\t\t\t-----WELCOME-----\n";
-//	cout << "Please select which event you want to attend to:\n";
-//	cout << "Available options(please select the number corresponding to the event): \n 1. Footbal event \n 2. Movies\n 3. Theatre \n 4. Others(you will specify what type of event you'd like)\n";
-//	int eventOption, ticketOption;
-//	cin >> eventOption;
-// 
-//	Event ev1;
-//
-//	cout << "Please enter a location:";
-//
-//	Location loc1;
-//
-//	cout << "Please select which ticket you would like to buy:";
-//	cout << "1. type 1\n 2. type 2\n 3. VIP/BOX\n";
-//
-//  cin>>ticketOption;
-//	Ticket tick1;
-//
-//	return 0;
-//}
+class Location {
+
+	int noCategories = 3;
+	int* seats;	//an array which will either have 0(available) or 1 (taken)
+	int noSeats;
+	category cat;
+	int catPrices[3]; //list of prices for each event
+	static int CAPACITY;
+public:
+
+};
+
+class Ticket {
+	unsigned long id;
+	int price;
+	category tickCat=TIP1;
+	bool isValid;
+	char* nameOfBuyer=nullptr;
+	const int MIN_LENGTH = 4;
+	static int NO_TICKETS;
+public:
+	char* getName(const char* nameOfBuyer) {
+		if (strlen(this->nameOfBuyer) < MIN_LENGTH)
+			throw exception("Invalid buyer name.");
+		char* copy = Util::copyString(this->nameOfBuyer);
+		return copy;
+	}
+
+	void setName() {
+		this->nameOfBuyer = Util::copyString(this->nameOfBuyer);
+	}
+
+	Ticket() : price(300),isValid(true) {
+		NO_TICKETS++;
+	}
+};
+
+int main() {
+ 
+	cout << "\t\t\t\t-----WELCOME-----\n";
+	cout << "Please select which event you want to attend to:\n";
+	cout << "Available options(please select the number corresponding to the event): \n 1. Footbal event \n 2. Movies\n 3. Theatre \n 4. Others(you will specify what type of event you'd like)\n";
+	int eventOption, ticketOption;
+	cin >> eventOption;
+ 
+	Event ev1;
+
+	cout << "Please enter a location:";
+
+	Location loc1;
+
+	cout << "Please select which ticket you would like to buy:";
+	cout << "1. type 1\n 2. type 2\n 3. VIP/BOX\n";
+
+  cin>>ticketOption;
+	Ticket tick1;
+
+	return 0;
+}
