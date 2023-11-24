@@ -4,6 +4,8 @@ using namespace std;
 
 
 int main() {
+	static int NO_EVENTS;
+	static int CAPACITY;
 
 	cout << "\t\t\t\t-----!!TICKET APP!!-----\n";
 	cout << "Please select which event you want to attend to:\n";

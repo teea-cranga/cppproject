@@ -19,16 +19,40 @@ public:
 	}
 };
 
+class Location {
+
+	string name = "";
+	int catPrices[4]; //list of prices for each event
+	int CAPACITY;		//to be made static
+
+public:
+	Location() {
+		for (int i = 0; i < 4; i++) {
+			this->catPrices[i] = 0;
+		}
+		this->CAPACITY = 100;
+		this->name = "None";
+	}
+
+	int& operator[](int index) {	//assigns another price for a specific ticket
+		if (index < 0 || index>4) {
+			throw exception("Invalid ticket type.");
+		}
+		return this->catPrices[index];
+	}
+};
+
 class Event {
 	eventType event;
 	char* name = nullptr;
 	int date[3] = { 1,1, 2023 };	//date[0] - day, date[1] - month, date[2] - year
 	string details = "";
+	Location loc;
 
 	const int MIN_LENGTH = 4;
-	
+	int NO_EVENTS;	//will change it to static
 public:
-	int NO_EVENTS=0;	//will change it to static
+	
 
 	void setName(const char* nume) {
 		this->name = Util::copyString(nume);
@@ -65,33 +89,22 @@ class Room {
 	int noRows;
 	category cat;
 public:
+	void setSeats(int noSeat) {
+		this->noSeats = noSeat;
+	}
+	void setRows(int noRow) {
+		this->noRows = noRow;
+	}
+	
 	Room() {
 		this->cat = TIP1;
 		this->noRows = 10;
 		this->noSeats = 10;
 	}
-};
-
-class Location {
-
-	string name = "";
-	int catPrices[4]; //list of prices for each event
-	int CAPACITY;
-
-public:
-	Location() {
-		for (int i = 0; i < 4; i++) {
-			this->catPrices[i] = 0;
-		}
-		this->CAPACITY = 100;
-		this->name = "None";
-	}
-
-	int& operator[](int index) {	//assigns another price for a specific ticket
-		if (index < 0 || index>4) {
-			throw exception("Invalid ticket type.");
-		}
-		return this->catPrices[index];
+	Room(int noRows, int noSeats, category cat) {
+		this->setRows(noRows);
+		this->setSeats(noSeats);
+		this->cat = cat;
 	}
 };
 
@@ -102,7 +115,9 @@ class Ticket {
 	bool isValid;
 	char* nameOfBuyer = nullptr;
 	const int MIN_LENGTH = 4;
-	
+	Room room;
+	Event ev;
+	Location loc;
 	
 public:
 	int NO_TICKETS;
