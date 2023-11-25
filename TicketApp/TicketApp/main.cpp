@@ -2,20 +2,19 @@
 #include"classes.h"
 using namespace std;
 
+int Event::NO_EVENTS = 0;
 
 int main() {
-	static int NO_EVENTS;
-	static int CAPACITY;
 
 	cout << "\t\t\t\t-----!!TICKET APP!!-----\n";
 	cout << "Please select which event you want to attend to:\n";
 	cout << "Available options(please select the number corresponding to the event): \n 1. Footbal event \n 2. Movies\n 3. Theatre \n 4. Others(you will specify what type of event you'd like)\n";
 	cout << "------------------------------------" << endl;
-	int eventOption, ticketOption;
-
+	
 	Event ev1;
 
 	cout << "Please enter a location:";
+
 
 	Location loc1;
 
