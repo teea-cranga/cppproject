@@ -4,8 +4,10 @@
 
 using namespace std;
 
-enum eventType { FOOTBALL = 1, MOVIE = 2, THEATRE = 3, OTHER = 4 };		//makes it easier to select options(at least for now)
-enum category { TIP1 = 1, TIP2 = 2, VIPORBOX = 3, DISABILITIES = 4 };	//default for every type of event, i think it is obsolete, but i will keep this for now
+//DISCLAIMER: The main.cpp file will include the application (sorry for naming like this, realised too late how to actually manage the files)
+
+enum class eventType { FOOTBALL = 1, MOVIE = 2, THEATRE = 3, OTHER = 4 };		
+enum class category { TIP1 = 1, TIP2 = 2, VIPORBOX = 3, DISABILITIES = 4 };	
 enum months { JANUARY=1, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 class Util {															
@@ -48,12 +50,11 @@ public:
 class Location {
 
 	string name = "";
-	int catPrices[4]; //list of prices for each event
+	int* catPrices; //list of prices for each event
 	int CAPACITY;	
 	bool accessForDis;	//if the place has seats for people with disabilities
 
 public:
-	
 
 	void noAccess() {
 		this->accessForDis = false;
@@ -65,19 +66,33 @@ public:
 		this->name = name;
 	}
 
-	void setPrices(const int prices[4]) {
-		for (int i = 0; i < 4; i++) {
-			if (prices[i] <= 0) {
-				throw exception("This price is invalid. Try again with other values.");
-			}
-			else {
-				
-				this->catPrices[i] = prices[i];
+	void setPrices(const int* prices) {
+		delete[] this->catPrices;
+		if (accessForDis == true) {
+			this->catPrices = new int[4];
+			memcpy(this->catPrices, prices, sizeof(int) * 4);
+		}
+		else {
+			this->catPrices = new int[3];
+			memcpy(this->catPrices, prices, sizeof(int) * 3);
+		}	
+	}
+
+	int* getPrices() {
+		int* copy;
+		if (accessForDis == true) {
+			copy = new int[4];
+			for (int i = 0; i < 4; i++) {
+				copy[i] = this->catPrices[i];
 			}
 		}
-		if (accessForDis == false) {
-			this->catPrices[3] = 0;
+		else {
+			copy = new int[3];
+			for (int i = 0; i < 3; i++) {
+				copy[i] = this->catPrices[i];
+			}
 		}
+		return copy;
 	}
 
 	Location() {
@@ -94,6 +109,17 @@ public:
 		this->setPrices(prices);
 	}
 
+	Location(const Location& loc) {
+		this->name = loc.name;
+		this->CAPACITY = loc.CAPACITY;
+		this->setPrices(loc.catPrices);
+		this->accessForDis = loc.accessForDis;
+	}
+
+	~Location() {
+		delete[] this->catPrices;
+	}
+
 	int& operator[](int index) {	//assigns another price for a specific ticket
 		if (index < 0 || index>4) {
 			throw exception("Invalid ticket type.");
@@ -101,10 +127,12 @@ public:
 		return this->catPrices[index];
 	}
 
-	Location operator*(int value) {
-		for (int i = 0; i < 4; i++) {
-			this->catPrices[i] *= value;
+	void operator=(const Location& loc) {
+		if (&loc == this) {
+			return;
 		}
+		delete[] this->catPrices;
+		this->setPrices(loc.catPrices);
 	}
 
 	friend void operator<<(ostream& console, Location& loc);
@@ -115,14 +143,7 @@ void operator<<(ostream& console, Location& loc) {
 
 	console << endl << "Location name: " << loc.name;
 	console << endl << "The prices of the tickets: ";
-	for (int i = 0; i < 4; i++) {
-		if (i == 3 && loc.catPrices[3] == 0) {
-			console << endl << "WARNING: this place doesn't have seats for people with disabilities.";
-		}
-		else
-			console << endl << loc.catPrices[i] << " " << (category)i;
-
-	}
+	console << loc.getPrices();
 	console << endl << "Capacity of the location: " << loc.CAPACITY << "seats.";
 }
 
@@ -140,20 +161,34 @@ void operator>>(istream& console, Location& loc) {
 	console >> loc.accessForDis;
 }
 
-//missing:
-//two operators(one MUST be =)
-//copy constructor
 class Event {
 	eventType event;
 	char* name = nullptr;
 	int date[3] = { 1,1, 2023 };	//date[0] - day, date[1] - month, date[2] - year
 	string details = "";
-	Location loc;
+
+	//for phase 2
+	//Location loc;
 
 	const int MIN_LENGTH = 4;
 	static int NO_EVENTS;	
 
 public:
+
+	string getEvent() {
+		switch (event) {
+		case eventType::FOOTBALL:
+			return "FOOTBALL";
+		case eventType::MOVIE:
+			return "MOVIE";
+		case eventType::THEATRE:
+			return "THEATRE";
+		case eventType::OTHER:
+			return "OTHER";
+		default:
+			return "OTHER";
+		}
+	}
 	
 	void printMonth() {
 		cout << (months)this->date[1];
@@ -197,7 +232,7 @@ public:
 	}
 
 	Event():details("None") {
-		this->event = OTHER;
+		this->event = eventType::OTHER;
 		this->setName("Unknown");
 		Event::NO_EVENTS+=1;
 		this->date[0] = 1;
@@ -213,9 +248,38 @@ public:
 		}
 	}
 
+	Event(const Event& ev) {
+		this->event = ev.event;
+		this->setName(ev.name);
+		for (int i = 0; i < 2; i++) {
+			this->date[i] = ev.date[i];
+		}
+		this->details = ev.details;
+		//this->loc = ev.loc;
+	}
+
 	~Event() {
 		delete[] this->name;
 		Event::NO_EVENTS-=1;
+	}
+
+	void operator=(const Event& ev) {
+		if (&ev == this) {
+			return;
+		}
+		delete[] this->name;
+		this->setName(ev.name);
+	}
+
+	Event operator++(int) {
+		Event copy = *this;
+		this->date[2] += 1;
+		return copy;
+	}
+
+	Event operator++() {
+		this->date[2] += 1;
+		return *this;
 	}
 
 	friend void operator<<(ostream& console, Event& ev);
@@ -224,23 +288,25 @@ public:
 
 void operator<<(ostream& console, Event& ev) {
 	console << endl << "Name of the event" << ev.getName();
-	console << endl << "The event is located at a/an: " << ev.event;
+	console << endl << "The event is located at a/an: " << ev.getEvent();
 	console << endl << "The event date is:";
 	ev.printDate();
 	console << endl << "Details about the event: ";
 	console << endl << ev.details;
 	console << endl << "More details about the event(regarding the location): ";
-	console << endl << ev.loc;
+	//console << endl << ev.loc;
 }
 
 void operator>>(istream& console, Event& ev) {
 	cout << endl << "Insert a name for the event:";
 	char buffer[2000];
-	console.getline(buffer, 2000); //if you need space in the string
+	console.getline(buffer, 2000);
 	console.clear();
 	ev.setName(buffer);
 	cout << endl << "Insert the type of event you want to attend: ";
-	//console >> ev.event;
+	int event;
+	console >> event;
+	ev.setEvent(event);
 	cout << endl << "Insert date: ";
 	for (int i = 0; i < 3; i++) {
 		console >> ev.date[i];
@@ -248,69 +314,77 @@ void operator>>(istream& console, Event& ev) {
 	cout << endl << "Insert details: ";
 	console >> ev.details;
 	cout << endl << "Get a location for the event: ";
-	console >> ev.loc;
+	//console >> ev.loc;
 }
 
+
+
 class Room {
-	char** roomSeats=nullptr;	//matrix which stores the state of a seat (- is taken, * for disabilities, / type 1, \ type 2, | vip)
-	int noSeats;
-	int noRows;
-	category cat;
+	int noRow;
+	int noSeat;
+	int maxRows=10;
+	int maxSeats=10;//will be modified in phase 2
+	bool isFull;
 public:
 
-	void setSeats(int noSeat) {
-		this->noSeats = noSeat;
+	void setRow(int row) {
+		if (row < 0 || row>10)
+			throw exception("Error. Invalid row.");
+		this->noRow = row;
 	}
 
-	void setRows(int noRow) {
-		this->noRows = noRow;
-	}
-	
-	Room() {
-		this->cat = TIP1;
-		this->noRows = 10;
-		this->noSeats = 10;
+	void setSeat(int seat) {
+		if (seat < 0 || seat>10)
+			throw exception("Error. Invalid row.");
+		this->noSeat = seat;
 	}
 
-	Room(int noRows, int noSeats, category cat) {
-		this->setRows(noRows);
-		this->setSeats(noSeats);
-		this->cat = cat;
+	bool operator!(){
+		return this->isFull == true;
 	}
+
+	friend void operator<<(ostream& console, Room& room);
+	friend void operator>>(istream& console, Room& room);
 };
 
+ void operator<<(ostream& console, Room& room) {
+	 console << "Rows available: ";
+	 console << room.maxRows;
+	 console << "Maximum seats per row: ";
+	 console << room.maxSeats;
+}
+ void operator>>(istream& console, Room& room) {
+	cout << "Select the row and seat you want:";
+	cout << "Row number (0-10): ";
+	console >> room.noRow;
+	cout << "Seat number (0-10): ";
+	console >> room.noRow;
+
+}
+
+
 class Ticket {
-	unsigned long id=0;
-	int price;
-	category tickCat = TIP1;
+	unsigned int id;
+	string nameOfBuyer;
 	bool isValid;
-	char* nameOfBuyer = nullptr;
 	const int MIN_LENGTH = 4;
-	Room room;
-	Event ev;
-	Location loc;
+	category tickCat;
+
+	//to be used for phase 2 i guess
+	//Room room;
+	//Event ev;
+	//Location loc;
 	
 public:
 
-	char* getName() {
-		if (strlen(this->nameOfBuyer) < MIN_LENGTH)
-			throw exception("Invalid buyer name.");
-		char* copy = Util::copyString(this->nameOfBuyer);
-		return copy;
-	}
-
-	void setName(const char* nameOfBuyer) {
-		this->nameOfBuyer = Util::copyString(this->nameOfBuyer);
-	}
-
-	category setCategory(int input) {
-		if (input < 1 || input>4) {
-			throw exception("Invalid category type. Please try again.");
+	void chechVal() {
+		if (this->isValid) {
+			cout << "The ticket is valid.";
 		}
-		this->tickCat = (category)input;
+		else cout << "The ticket is unavailable";
 	}
 
-	void tickIsvalid() {
+	void tickIsValid() {
 		this->isValid = true;
 	}
 
@@ -318,8 +392,80 @@ public:
 		this->isValid = false;
 	}
 
-	Ticket() : price(300), isValid(true) {
-		this->setName("John Doe");
-		this->tickIsvalid();
+	void setName(string name) {
+		if (name.length() < this->MIN_LENGTH) {
+			throw exception("Invalid buyer name.");
+		}
+		this->nameOfBuyer = name;
 	}
+
+	string getCategory() {
+		switch (this->tickCat) {
+		case category::TIP1:
+			return "TIP1";
+		case category::TIP2:
+			return "TIP2";
+		case category::VIPORBOX:
+			return "VIP/BOX";
+		default:
+			return "DISABILITIES";
+		}
+	}
+
+	void setCategory(int input) {
+		switch (input) {
+		case 1:
+			this->tickCat = category::TIP1;
+			break;
+		case 2:
+			this->tickCat=category::TIP2;
+			break;
+		case 3:
+			this->tickCat=category::VIPORBOX;
+			break;
+		default:
+			this->tickCat=category::DISABILITIES;
+			break;
+		}
+	}
+
+	Ticket() {
+		//since the id will be randomly generated, i will use rand() in phase 2. until then, I initialize with a default value
+		this->id = 300;
+		this->nameOfBuyer = "Unknown";
+		this->tickCat = category::TIP1;
+		this->tickIsValid();
+	}
+
+	Ticket(int id, string name, category cat) {
+		this->id = id;
+		this->setName(name);
+		this->tickIsValid();
+		this->tickCat = cat;
+	}
+
+	//phase 2
+	~Ticket() {
+	//ev.~Event();
+		this->tickIsNotValid();
+	}
+
+
+	friend void operator<<(ostream& console, Ticket& t);
+	friend void operator>>(istream& console, Ticket& t);
+};
+
+void operator<<(ostream& console, Ticket& t) {
+	console << endl << "Ticket id is: " << t.id;
+	console << endl << "The name of the buyer: " << t.nameOfBuyer;
+	console << endl << "The ticket type: " << t.getCategory();
+	console << endl << "Ticket status: " << t.isValid;
+};
+void operator>>(istream& console, Ticket& t) {
+	cout << "Enter name: ";
+	console >> t.nameOfBuyer;
+	cout << "Select which ticket you want: ";
+	int input;
+	console >> input;
+	t.setCategory(input);
 };
