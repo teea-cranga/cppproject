@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string.h>
+#include<cstdlib>
 
 using namespace std;
 
@@ -44,6 +45,15 @@ public:
 			}
 		}
 		return true;
+	}
+	static char* randomCodeGenerator() {
+		char code[11] = { "1234567890" };
+		char* generatedCode=new char[5];
+		for (int i = 0; i < 5; i++) {
+			generatedCode[i] = code[rand()%10];
+		}
+		generatedCode[5] = NULL;
+		return generatedCode;
 	}
 };
 
@@ -168,7 +178,7 @@ class Event {
 	string details = "";
 
 	//for phase 2
-	//Location loc;
+	Location loc;
 
 	const int MIN_LENGTH = 4;
 	static int NO_EVENTS;	
@@ -186,7 +196,7 @@ public:
 		case eventType::OTHER:
 			return "OTHER";
 		default:
-			return "OTHER";
+			throw exception("Invalid input. Try again.");
 		}
 	}
 	
@@ -255,7 +265,7 @@ public:
 			this->date[i] = ev.date[i];
 		}
 		this->details = ev.details;
-		//this->loc = ev.loc;
+		this->loc = ev.loc;
 	}
 
 	~Event() {
@@ -371,9 +381,9 @@ class Ticket {
 	category tickCat;
 
 	//to be used for phase 2 i guess
-	//Room room;
-	//Event ev;
-	//Location loc;
+	Room room;
+	Event ev;
+	Location loc;
 	
 public:
 
@@ -446,7 +456,7 @@ public:
 
 	//phase 2
 	~Ticket() {
-	//ev.~Event();
+	ev.~Event();
 		this->tickIsNotValid();
 	}
 
