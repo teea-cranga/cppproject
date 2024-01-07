@@ -7,12 +7,12 @@ using namespace std;
 
 //DISCLAIMER: The main.cpp file will include the application (sorry for naming like this, realised too late how to actually manage the files)
 
-enum class eventType { FOOTBALL = 1, MOVIE = 2, THEATRE = 3, OTHER = 4 };		
+enum class eventType { FOOTBALL = 1, MOVIE = 2, THEATRE = 3};		
 enum class category { TIP1 = 1, TIP2 = 2, VIPORBOX = 3, DISABILITIES = 4 };	
 enum months { JANUARY=1, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
-class Util {															
-public:																	
+class Util {
+public:
 	static char* copyString(const char* source) {
 		if (source == nullptr) {
 			return nullptr;
@@ -25,7 +25,7 @@ public:
 		if (day < 0)
 			throw exception("Invalid data.");
 		switch (month) {
-		case (1,3,5,7,8,10,12):
+		case (1, 3, 5, 7, 8, 10, 12):
 			if (day > 31)
 				throw exception("Invalid date.");
 			break;
@@ -35,7 +35,7 @@ public:
 			break;
 		case 2:
 			if (year % 4 == 0) {
-				if(day>29)
+				if (day > 29)
 					throw exception("Invalid date.");
 			}
 			else {
@@ -48,14 +48,103 @@ public:
 	}
 	static char* randomCodeGenerator() {
 		char code[11] = { "1234567890" };
-		char* generatedCode=new char[5];
+		char* generatedCode = new char[5];
 		for (int i = 0; i < 5; i++) {
-			generatedCode[i] = code[rand()%10];
+			generatedCode[i] = code[rand() % 10];
 		}
 		generatedCode[5] = NULL;
 		return generatedCode;
 	}
+	
 };
+
+class Menu {
+public:
+	 void menuStart() {
+		int choice, OK = 1;
+		while (OK) {
+			cout << "\t\t\t\t-----!!TICKET APP!!-----\n";
+			cout << endl << "Available options: ";
+			cout << endl << "1. Add event";
+			cout << endl << "2. See locations";
+			cout << endl << "3. Buy ticket";
+			cout << endl << "4. Check validity";
+			cout << endl << "------------------------------------\n";
+			cin >> choice;
+			OK = 0;
+			switch (choice) {
+			case 1:
+				option1();
+				break;
+			case 2:
+				option2();
+				break;
+			case 3:
+				option3();
+				break;
+			default:
+				cout << "Invalid number. Try again.";
+				OK = 1;
+				break;
+			}
+		}
+	}
+	 void option1() {
+		 int choice = 0;
+		 while (!choice) {
+			 cout << "Select event type:\n";
+			 cout << "1. Sports\n";
+			 cout << "2. Movies\n";
+			 cout << "3. Theatre\n";
+			 cout << "-------------------------------\n";
+			 switch (choice) {
+			 case 1:
+				 //display the sport events
+				 break;
+			 case 2:
+				 //display the movie events
+				 break;
+			 case 3:
+				 //display the theatre events
+				 break;
+			 default:
+				 throw exception("Invalid event type. Please try again.");
+				 choice = 0;
+				 break;
+			 }
+		 }
+	 }
+	 void option2() {
+		 //displayLocations(); //a function which will return all the available events
+	 }
+	 void option3() {
+		 int choice = 0;
+		 while (!choice) {
+			 cout << "Select the event you would like to attend.";
+			 cout << "1. Sports\n";
+			 cout << "2. Movies\n";
+			 cout << "3. Theatre\n";
+			 cout << "4. Other\n";
+			 cout << "-------------------------------\n";
+			 switch (choice) {
+			 case 1:
+				 //display the room
+				 break;
+			 case 2:
+				 //display the room
+				 break;
+			 case 3:
+				 //display the room
+				 break;
+			 default:
+				 throw exception("Invalid event type. Please try again.");
+				 choice = 0;
+				 break;
+			 }
+		 }
+	 }
+};
+
 
 class Location {
 
@@ -193,8 +282,6 @@ public:
 			return "MOVIE";
 		case eventType::THEATRE:
 			return "THEATRE";
-		case eventType::OTHER:
-			return "OTHER";
 		default:
 			throw exception("Invalid input. Try again.");
 		}
@@ -242,7 +329,7 @@ public:
 	}
 
 	Event():details("None") {
-		this->event = eventType::OTHER;
+		this->event = eventType::FOOTBALL;
 		this->setName("Unknown");
 		Event::NO_EVENTS+=1;
 		this->date[0] = 1;
@@ -374,7 +461,7 @@ public:
 
 
 class Ticket {
-	unsigned int id;
+	char* id;
 	string nameOfBuyer;
 	bool isValid;
 	const int MIN_LENGTH = 4;
@@ -440,15 +527,14 @@ public:
 	}
 
 	Ticket() {
-		//since the id will be randomly generated, i will use rand() in phase 2. until then, I initialize with a default value
-		this->id = 300;
+		this->id = Util::copyString(Util::randomCodeGenerator());
 		this->nameOfBuyer = "Unknown";
 		this->tickCat = category::TIP1;
 		this->tickIsValid();
 	}
 
-	Ticket(int id, string name, category cat) {
-		this->id = id;
+	Ticket(char* id, string name, category cat) {
+		this->id = Util::copyString(id);
 		this->setName(name);
 		this->tickIsValid();
 		this->tickCat = cat;
