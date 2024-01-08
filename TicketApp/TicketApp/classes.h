@@ -7,7 +7,6 @@ using namespace std;
 
 //DISCLAIMER: The main.cpp file will include the application (sorry for naming like this, realised too late how to actually manage the files)
 
-enum class eventType { FOOTBALL = 1, MOVIE = 2, THEATRE = 3};		
 enum class category { TIP1 = 1, TIP2 = 2, VIPORBOX = 3, DISABILITIES = 4 };	
 enum months { JANUARY=1, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
@@ -48,7 +47,7 @@ public:
 	}
 	static char* randomCodeGenerator() {
 		char code[11] = { "1234567890" };
-		char* generatedCode = new char[5];
+		char* generatedCode = new char[6];
 		for (int i = 0; i < 5; i++) {
 			generatedCode[i] = code[rand() % 10];
 		}
@@ -261,7 +260,6 @@ void operator>>(istream& console, Location& loc) {
 }
 
 class Event {
-	eventType event;
 	char* name = nullptr;
 	int date[3] = { 1,1, 2023 };	//date[0] - day, date[1] - month, date[2] - year
 	string details = "";
@@ -273,19 +271,6 @@ class Event {
 	static int NO_EVENTS;	
 
 public:
-
-	string getEvent() {
-		switch (event) {
-		case eventType::FOOTBALL:
-			return "FOOTBALL";
-		case eventType::MOVIE:
-			return "MOVIE";
-		case eventType::THEATRE:
-			return "THEATRE";
-		default:
-			throw exception("Invalid input. Try again.");
-		}
-	}
 	
 	void printMonth() {
 		cout << (months)this->date[1];
@@ -295,12 +280,6 @@ public:
 		cout << this->date[0]<< " ";
 		printMonth();
 		cout << " " << this->date[2];
-	}
-
-	void setEvent(int input) {		
-		if (input < 1 || input > 4)
-			throw exception("Invalid number. Please enter another number.");
-		this->event = (eventType)input;
 	}
 
 	void setName(const char* nume) {
@@ -328,8 +307,7 @@ public:
 		return Event::NO_EVENTS;
 	}
 
-	Event():details("None") {
-		this->event = eventType::FOOTBALL;
+	Event():details("None"),loc() {
 		this->setName("Unknown");
 		Event::NO_EVENTS+=1;
 		this->date[0] = 1;
@@ -337,16 +315,22 @@ public:
 		this->date[2] = 2001;
 	}
 
-	Event(eventType ev, const char* name, int date[3]) {
-		this->event = ev;
+	Event(const char* name, int date[3])  {
 		this->setName(name);
 		for (int i = 0; i < 2; i++) {
 			this->date[i] = date[i];
 		}
 	}
+	Event(const char* name, int date[3], string details, Location loc) {
+		this->setName(name);
+		for (int i = 0; i < 2; i++) {
+			this->date[i] = date[i];
+		}
+		this->details = details;
+		//loc = new Location(loc); //to be fixed
+	}
 
 	Event(const Event& ev) {
-		this->event = ev.event;
 		this->setName(ev.name);
 		for (int i = 0; i < 2; i++) {
 			this->date[i] = ev.date[i];
@@ -385,7 +369,6 @@ public:
 
 void operator<<(ostream& console, Event& ev) {
 	console << endl << "Name of the event" << ev.getName();
-	console << endl << "The event is located at a/an: " << ev.getEvent();
 	console << endl << "The event date is:";
 	ev.printDate();
 	console << endl << "Details about the event: ";
@@ -403,7 +386,6 @@ void operator>>(istream& console, Event& ev) {
 	cout << endl << "Insert the type of event you want to attend: ";
 	int event;
 	console >> event;
-	ev.setEvent(event);
 	cout << endl << "Insert date: ";
 	for (int i = 0; i < 3; i++) {
 		console >> ev.date[i];
@@ -414,8 +396,19 @@ void operator>>(istream& console, Event& ev) {
 	//console >> ev.loc;
 }
 
+class Sports :public Event {
+public:
+	Sports(char* name, int date[3]) :Event(name, date) {
 
+	}
+};
 
+class Theatre : public Event {
+
+};
+class Movie :public Event {
+
+};
 class Room {
 	int noRow;
 	int noSeat;
